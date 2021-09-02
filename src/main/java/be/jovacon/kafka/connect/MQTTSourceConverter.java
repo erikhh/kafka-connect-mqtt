@@ -1,6 +1,7 @@
 package be.jovacon.kafka.connect;
 
 import be.jovacon.kafka.connect.config.MQTTSourceConnectorConfig;
+import java.util.Map;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.utils.Utils;
 import org.apache.kafka.connect.data.Schema;
@@ -8,6 +9,8 @@ import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.header.ConnectHeaders;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.storage.Converter;
+import org.apache.kafka.connect.storage.ConverterConfig;
+import org.apache.kafka.connect.storage.ConverterType;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,13 @@ public class MQTTSourceConverter {
     public MQTTSourceConverter(MQTTSourceConnectorConfig mqttSourceConnectorConfig) {
         this.mqttSourceConnectorConfig = mqttSourceConnectorConfig;
         this.kafkaTopic = this.mqttSourceConnectorConfig.getString(MQTTSourceConnectorConfig.KAFKA_TOPIC);
-        this.payloadConverter = mqttSourceConnectorConfig.getConfiguredInstance(MQTTSourceConnectorConfig.MQTT_PAYLOAD_CONVERTER, Converter.class);
+        final String klass = mqttSourceConnectorConfig.getString(MQTTSourceConnectorConfig.MQTT_PAYLOAD_CONVERTER);
+        try {
+            this.payloadConverter = Utils.newInstance(klass, Converter.class);
+        } catch (ClassNotFoundException e) {
+            throw new ConfigException("Invalid config:" + mqttSourceConnectorConfig.getString(MQTTSourceConnectorConfig.MQTT_PAYLOAD_CONVERTER) + " ClassNotFoundException exception occurred", e);
+        }
+        payloadConverter.configure(mqttSourceConnectorConfig.originals(), false);
     }
 
     protected SourceRecord convert(String topic, MqttMessage mqttMessage) {
