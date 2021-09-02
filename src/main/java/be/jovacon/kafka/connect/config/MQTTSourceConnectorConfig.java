@@ -4,6 +4,7 @@ import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 
 import java.util.Map;
+import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
 
 public class MQTTSourceConnectorConfig extends AbstractConfig {
@@ -49,6 +50,10 @@ public class MQTTSourceConnectorConfig extends AbstractConfig {
 
     public static final String MQTT_TLS_VERSION = "mqtt.ssl.tlsVersion";
     public static final String MQTT_TLS_VERSION_DOC = "Sets the TLS version to use, default is \"TLSV1.2\"";
+
+    public static final String MQTT_PAYLOAD_CONVERTER = "mqtt.payload.converter";
+    public static final String MQTT_PAYLOAD_CONVERTER_DOC = "Converter to use for converting the payload of the MQTT messages to connect records.";
+    public static final String MQTT_PAYLOAD_CONVERTER_DEFAULT = "org.apache.kafka.connect.storage.StringConverter";
 
     public static final String KAFKA_TOPIC = "kafka.topic";
     public static final String KAFKA_TOPIC_DOC = "List of kafka topics to publish to";
@@ -131,6 +136,10 @@ public class MQTTSourceConnectorConfig extends AbstractConfig {
                         "TLSV1.2",
                         ConfigDef.Importance.LOW,
                         MQTT_TLS_VERSION_DOC)
-                ;
+                .define(MQTT_PAYLOAD_CONVERTER,
+                        Type.CLASS,
+                        MQTT_PAYLOAD_CONVERTER_DEFAULT,
+                        ConfigDef.Importance.HIGH,
+                        MQTT_PAYLOAD_CONVERTER_DOC);
     }
 }
