@@ -137,7 +137,7 @@ public class MQTTSourceConnectorConfig extends AbstractConfig {
                         ConfigDef.Importance.LOW,
                         MQTT_TLS_VERSION_DOC)
                 .define(MQTT_PAYLOAD_CONVERTER,
-                        Type.CLASS,
+                        Type.STRING,
                         MQTT_PAYLOAD_CONVERTER_DEFAULT,
                         ConfigDef.Importance.HIGH,
                         MQTT_PAYLOAD_CONVERTER_DOC);
